@@ -1,0 +1,276 @@
+
+==================== FINAL INTERFACE ====================
+2017-12-18 21:40:01.6578544 UTC
+
+interface calc-0.1.0.0-9Oq6hdcIFCX6Vb7F86N9Ql:Arithmetic 8002
+  interface hash: ff73a4d91224b7f5f617ba138b8f788e
+  ABI hash: 41a2455ae465b42bc95557397432b329
+  export-list hash: d390c5003ad514b1d0230238d5387600
+  orphan hash: 693e9af84d3dfcc71e640e005bdc5e2e
+  flag hash: f8b847b675a91348479da0c1f8d4b9ba
+  sig of: Nothing
+  used TH splices: False
+  where
+exports:
+  Arithmetic.evaluate
+  Arithmetic.interpret
+  Arithmetic.Equation{Arithmetic.Add Arithmetic.Div Arithmetic.Exit Arithmetic.Mul Arithmetic.Sub}
+module dependencies:
+package dependencies: base-4.9.1.0* ghc-prim-0.5.0.0
+                      integer-gmp-1.0.0.1
+orphans: base-4.9.1.0:GHC.Base base-4.9.1.0:GHC.Float
+family instance modules: base-4.9.1.0:Control.Applicative
+                         base-4.9.1.0:Data.Either base-4.9.1.0:Data.Functor.Const
+                         base-4.9.1.0:Data.Monoid base-4.9.1.0:Data.Type.Equality
+                         base-4.9.1.0:GHC.Generics base-4.9.1.0:GHC.IO.Exception
+                         base-4.9.1.0:GHC.TypeLits
+import  -/  base-4.9.1.0:GHC.Base 4caea1123ecf4b46e27cbccd6d279377
+import  -/  base-4.9.1.0:GHC.Num 38b8aac8807c096c7f3ca3c1eff02939
+import  -/  base-4.9.1.0:GHC.Real b88ae4a48c079652623073a5bbf5c9b0
+import  -/  base-4.9.1.0:Prelude 74b3e204395920329f6de9d97206abe9
+import  -/  base-4.9.1.0:Text.Read 3cc85705eeac93ec93da7f5edfd7bc15
+41d0679b45ba774dda3eba2de2154f86
+  $tc'Add :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   12907265835196930427##
+                   16118873494763029952##
+                   Arithmetic.$trModule
+                   Arithmetic.$tc'Add1) -}
+a630a49f8c61b3d80fcd9bc5a44e0f20
+  $tc'Add1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Add"#) -}
+3f7b0f1ef762db4b98caa960aa356385
+  $tc'Div :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   5512534827247750475##
+                   10963386731111107152##
+                   Arithmetic.$trModule
+                   Arithmetic.$tc'Div1) -}
+e001d4ac64d32f9a5d9cfdfb70be78bf
+  $tc'Div1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Div"#) -}
+49dcf29572145f370612d8a6c472d5fc
+  $tc'Exit :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   16604042507551765752##
+                   9536400507773978561##
+                   Arithmetic.$trModule
+                   Arithmetic.$tc'Exit1) -}
+b75ef4df1d269bddf59735a7322c7128
+  $tc'Exit1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Exit"#) -}
+25019a3063539cf5656013f6975347ed
+  $tc'Mul :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   11892281769437303522##
+                   1737329872222948095##
+                   Arithmetic.$trModule
+                   Arithmetic.$tc'Mul1) -}
+fdb853cfe037288edb0018db60f0d31b
+  $tc'Mul1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Mul"#) -}
+11cf355a30efc759b4686d46295bcc17
+  $tc'Sub :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   228652832009958823##
+                   11226237089256204049##
+                   Arithmetic.$trModule
+                   Arithmetic.$tc'Sub1) -}
+b0c18891f1e4128ff47461b5320da16b
+  $tc'Sub1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "'Sub"#) -}
+89a9d239e44f7c1d77f65753e62b42e8
+  $tcEquation :: GHC.Types.TyCon
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.TyCon
+                   14943132888078402067##
+                   11495083399834475968##
+                   Arithmetic.$trModule
+                   Arithmetic.$tcEquation1) -}
+00733909fc072304e9939acfbeb1c65a
+  $tcEquation1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Equation"#) -}
+b43d928e4194dcd944ae44e5257cbba2
+  $trModule :: GHC.Types.Module
+  {- HasNoCafRefs, Strictness: m,
+     Unfolding: (GHC.Types.Module
+                   Arithmetic.$trModule2
+                   Arithmetic.$trModule1) -}
+2f42dcf47e32b23f15beef54910c92a7
+  $trModule1 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS "Arithmetic"#) -}
+355c5a2846139108e04e10699402d135
+  $trModule2 :: GHC.Types.TrName
+  {- HasNoCafRefs, Strictness: m1,
+     Unfolding: (GHC.Types.TrNameS
+                   "calc-0.1.0.0-9Oq6hdcIFCX6Vb7F86N9Ql"#) -}
+87436e19ed1446b3b7dc335fdf98e7bb
+  $wevaluate ::
+    GHC.Prim.Double# -> Arithmetic.Equation -> GHC.Prim.Double#
+  {- Arity: 2, Strictness: <S,U><S,1*U>, Inline: [0],
+     Unfolding: (\ (ww :: GHC.Prim.Double#)
+                   (w :: Arithmetic.Equation) ->
+                 case w of wild {
+                   Arithmetic.Mul y
+                   -> case y of wild1 { GHC.Types.D# y1 -> GHC.Prim.*## ww y1 }
+                   Arithmetic.Add y
+                   -> case y of wild1 { GHC.Types.D# y1 -> GHC.Prim.+## ww y1 }
+                   Arithmetic.Sub y
+                   -> case y of wild1 { GHC.Types.D# y1 -> GHC.Prim.-## ww y1 }
+                   Arithmetic.Div y
+                   -> case y of wild1 { GHC.Types.D# y1 -> GHC.Prim./## ww y1 }
+                   Arithmetic.Exit
+                   -> case Arithmetic.evaluate1 ret_ty GHC.Prim.Double# of {} }) -}
+716b4c66634e29cfa0ede301a49726d6
+  data Equation
+    = Mul GHC.Types.Double
+    | Add GHC.Types.Double
+    | Sub GHC.Types.Double
+    | Div GHC.Types.Double
+    | Exit
+d6b97d5b654fea8a170c5be7c83fabe1
+  evaluate ::
+    GHC.Types.Double -> Arithmetic.Equation -> GHC.Types.Double
+  {- Arity: 2, Strictness: <S(S),1*U(U)><S,1*U>m, Inline: INLINE[0],
+     Unfolding: InlineRule (2, True, False)
+                (\ (w :: GHC.Types.Double) (w1 :: Arithmetic.Equation) ->
+                 case w of ww { GHC.Types.D# ww1 ->
+                 case Arithmetic.$wevaluate ww1 w1 of ww2 { DEFAULT ->
+                 GHC.Types.D# ww2 } }) -}
+32ea4fac3bc18faecd8d92e160ff3171
+  evaluate1 :: GHC.Types.Double
+  {- Strictness: x -}
+19cacbbbca37d5d0cc15242958dc197a
+  interpret :: [GHC.Base.String] -> Arithmetic.Equation
+  {- Arity: 1, Strictness: <S,1*U>,
+     Unfolding: (\ (ds :: [GHC.Base.String]) ->
+                 case ds of wild {
+                   [] -> Arithmetic.Exit
+                   : ds1 ds2
+                   -> case ds1 of wild1 {
+                        [] -> Arithmetic.Exit
+                        : ds3 ds4
+                        -> case ds3 of wild2 { GHC.Types.C# ds5 ->
+                           case ds5 of ds6 {
+                             DEFAULT -> Arithmetic.Exit
+                             '*'#
+                             -> case ds4 of wild3 {
+                                  []
+                                  -> case ds2 of wild4 {
+                                       [] -> Arithmetic.Exit
+                                       : y ds7
+                                       -> case ds7 of wild5 {
+                                            []
+                                            -> Arithmetic.Mul
+                                                 (case Text.Read.readEither6
+                                                         @ GHC.Types.Double
+                                                         (Text.ParserCombinators.ReadP.run
+                                                            @ GHC.Types.Double
+                                                            Arithmetic.interpret3
+                                                            y) of wild6 {
+                                                    [] -> Arithmetic.interpret2
+                                                    : x ds8
+                                                    -> case ds8 of wild7 {
+                                                         [] -> x
+                                                         : ipv ipv1 -> Arithmetic.interpret1 } })
+                                            : ipv ipv1 -> Arithmetic.Exit } }
+                                  : ipv ipv1 -> Arithmetic.Exit }
+                             '+'#
+                             -> case ds4 of wild3 {
+                                  []
+                                  -> case ds2 of wild4 {
+                                       [] -> Arithmetic.Exit
+                                       : y ds7
+                                       -> case ds7 of wild5 {
+                                            []
+                                            -> Arithmetic.Add
+                                                 (case Text.Read.readEither6
+                                                         @ GHC.Types.Double
+                                                         (Text.ParserCombinators.ReadP.run
+                                                            @ GHC.Types.Double
+                                                            Arithmetic.interpret3
+                                                            y) of wild6 {
+                                                    [] -> Arithmetic.interpret2
+                                                    : x ds8
+                                                    -> case ds8 of wild7 {
+                                                         [] -> x
+                                                         : ipv ipv1 -> Arithmetic.interpret1 } })
+                                            : ipv ipv1 -> Arithmetic.Exit } }
+                                  : ipv ipv1 -> Arithmetic.Exit }
+                             '-'#
+                             -> case ds4 of wild3 {
+                                  []
+                                  -> case ds2 of wild4 {
+                                       [] -> Arithmetic.Exit
+                                       : y ds7
+                                       -> case ds7 of wild5 {
+                                            []
+                                            -> Arithmetic.Sub
+                                                 (case Text.Read.readEither6
+                                                         @ GHC.Types.Double
+                                                         (Text.ParserCombinators.ReadP.run
+                                                            @ GHC.Types.Double
+                                                            Arithmetic.interpret3
+                                                            y) of wild6 {
+                                                    [] -> Arithmetic.interpret2
+                                                    : x ds8
+                                                    -> case ds8 of wild7 {
+                                                         [] -> x
+                                                         : ipv ipv1 -> Arithmetic.interpret1 } })
+                                            : ipv ipv1 -> Arithmetic.Exit } }
+                                  : ipv ipv1 -> Arithmetic.Exit }
+                             '/'#
+                             -> case ds4 of wild3 {
+                                  []
+                                  -> case ds2 of wild4 {
+                                       [] -> Arithmetic.Exit
+                                       : y ds7
+                                       -> case ds7 of wild5 {
+                                            []
+                                            -> Arithmetic.Div
+                                                 (case Text.Read.readEither6
+                                                         @ GHC.Types.Double
+                                                         (Text.ParserCombinators.ReadP.run
+                                                            @ GHC.Types.Double
+                                                            Arithmetic.interpret3
+                                                            y) of wild6 {
+                                                    [] -> Arithmetic.interpret2
+                                                    : x ds8
+                                                    -> case ds8 of wild7 {
+                                                         [] -> x
+                                                         : ipv ipv1 -> Arithmetic.interpret1 } })
+                                            : ipv ipv1 -> Arithmetic.Exit } }
+                                  : ipv ipv1 -> Arithmetic.Exit } } } } }) -}
+bb945674a188c5b0791cca5e335ba75f
+  interpret1 :: GHC.Types.Double
+  {- Strictness: x -}
+5fa89202925215561e436ec396cd2585
+  interpret2 :: GHC.Types.Double
+  {- Strictness: x -}
+01cb439eeb0ed3dd46addeb809839fa9
+  interpret3 :: Text.ParserCombinators.ReadP.P GHC.Types.Double
+  {- Unfolding: (GHC.Read.$fReadDouble9
+                   GHC.Read.$fReadDouble_$sconvertFrac
+                   Text.ParserCombinators.ReadPrec.minPrec
+                   @ GHC.Types.Double
+                   (Text.Read.readEither5 @ GHC.Types.Double)) -}
+vectorised variables:
+vectorised tycons:
+vectorised reused tycons:
+parallel variables:
+parallel tycons:
+trusted: safe
+require own pkg trusted: False
+
