@@ -26,10 +26,10 @@
   * 2013: GADTs (simulated Dependent Types, existentially qualified types)
   
 - Q3
-  * 2017: Functor, Applicative, Monad, Monad Transformers, Reader Transformer, why not IO, lift
-  * 2015: Monad Transformers, Error Monad Transformer, why not IO, lift
-  * 2014: Monad Transformers, Writer Transformer Monad, why not IO, lift, mtl as a way of avoiding lift
-  * 2013: Monad Transformers, State Transformer Monad, why not IO, Identity monad and its trans use, lift
+  * 2017: Functor, Applicative, Monad, Monad Transformers, Reader Transformer implementation, why not IO, lift
+  * 2015: Monad Transformers, Error Monad Transformer implementation, why not IO, lift
+  * 2014: Monad Transformers, Writer Transformer Monad implementation, why not IO, lift, mtl as a way of avoiding lift
+  * 2013: Monad Transformers, State Transformer Monad implementation, why not IO, Identity monad and its trans use, lift
   
 - Q4
   * 2017: Concurrency (Chan constructed through MVARs), STM, IO within STM
