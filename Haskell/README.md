@@ -16,7 +16,7 @@
 - Q1
   * 2017: DSLs
   * 2015: DSLs & Type Checking vs Type Inference
-  * 2014: DSLs & Implenting Monad Instances
+  * 2014: DSLs & Implementing Monad Instances
   * 2013: DSLs
   
 - Q2
