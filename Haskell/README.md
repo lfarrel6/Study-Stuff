@@ -4,6 +4,7 @@
 
 - [Study Tasks](#todo)
 - [Analysis of Past Paper Questions](#previous-questions)
+- [Sean's Repo](https://github.com/McGizzle/CS4012-Functional-Programming)
 
 ## ToDo
 
