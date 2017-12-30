@@ -6,7 +6,7 @@
   - [Monad Transformers](#monad-transformers)
   - [Parallelism](#parallelism)
   - [Concurrency](#concurrency)
-  - [Embedded DSLs](#emedded-dsls)
+  - [Embedded DSLs](#embedded-dsls)
   - [Implementing Type Inference](#implementing-type-inference)
   - [Advanced Type Systems](#advanced-type-systems)
   
@@ -58,6 +58,8 @@
     * Monads post 7.10 provide the same functionality, Functors and Applicatives just capture some of the more general behaviour
     * Functors and Applicatives can make defining a monadic instance easier: `return = pure` is a satisfactory definition
     * And if defining the instance of Functor for a Monad, we can also use `fmap = liftM`
+
+##### [Further explanation of Functors, Applicatives, and Monads, and their relationship.](https://en.wikibooks.org/wiki/Haskell/Applicative_functors)
 
 ##### How would we let the compiler know that the Functor we are defining is also a Monad?
 
