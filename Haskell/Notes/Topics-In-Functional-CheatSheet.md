@@ -157,5 +157,5 @@ Textual | Show, Read
     * How are phantom types useful?
     * Imagine we have a system which tracks distance in both Kilometers, and Miles. We really don't want to mix Kilometers and Miles.
     * So in other words, we would like to give the compiler some embedded knowledge of the unit of distance that we are using. This is perfect for phantom types.
-    * ![Distance example with Units](../imgs/PhantomDistance.png)
+    * ![Distance with Phantom Units](imgs/PhantomDistance.png)
   
