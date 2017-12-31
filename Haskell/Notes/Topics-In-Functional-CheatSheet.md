@@ -122,6 +122,24 @@ Textual | Show, Read
 
 ### Monad Transformers
 
+  - Implementations can be found in [Sean's repo](https://github.com/McGizzle/CS4012-Functional-Programming)
+  - Monads do not compose naturally
+    * E.g. we might want to have a `State` monad with error handling from `Maybe`
+    * `newtype SM s a = SM (s -> Maybe (a,s))` vs `newtype SM s a = SM (s -> (Maybe a, s))`
+    * Not clear which is right *(possibly neither)*
+    * Using a type like `IO (Maybe a)` would work, but would force us to pattern match in do blocks even though the maybe monad provides that feature.
+  - So we use Monad transformers to to handle this composition
+    * **We use transformers to combine/mix desired effects from different monads.**
+    * `class Monad m => Err m where`<br>`eFail :: m a`<br>`eHandle :: m a -> m a -> m a`<br>**For a monad `m`, we can transform it into a monad which maintains the effects of `m`, but can also error handle using `eFail` and `eHandle`**
+    * To make it useful, we define a way to access the operations of `m`
+    * `class (Monad m, Monad (t m)) => MonadTransformer t m where`<br>`lift :: m a -> t m a`
+    * `lift` allows us to bring a monadic computation (of the `m` monad) into the context of our transformer, `t`
+    * There is an example concrete instance ErrTM [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Monad%20Transformers.pdf)
+  - Haskell provides monad transformers in several libraries, we looked at the mtl library in the course
+    * The mtl library requires any monad transformer to be an instance of the type class `MonadTrans` (which simply provides `lift`)
+    * Then, to provide any compatability, the transformer must become an instance of the type class of any monad with which it is compatible e.g. `MonadState`
+  - There isn't too much else on MonadTransformers that springs to mind, other than implementing our own ones. Again, [@Sean'sRepo](https://github.com/McGizzle/CS4012-Functional-Programming)
+
 ### Parallelism
 
 ### Concurrency
