@@ -149,3 +149,13 @@ Textual | Show, Read
 ### Implementing Type Inference
 
 ### Advanced Type Systems
+
+  - A large part of Haskell's power is due to its type system, which has several interesting extensions
+  - **Phantom Types**
+    * A phantom type is **"A type parameter that isn't mentioned anywhere in the body of the declaration"**
+    * e.g. in `newtype Ty a b = T a`, `b` is a phantom type as it never appears on the RHS
+    * How are phantom types useful?
+    * Imagine we have a system which tracks distance in both Kilometers, and Miles. We really don't want to mix Kilometers and Miles.
+    * So in other words, we would like to give the compiler some embedded knowledge of the unit of distance that we are using. This is perfect for phantom types.
+    * ![Distance example with Units](../imgs/PhantomDistance.png)
+  
