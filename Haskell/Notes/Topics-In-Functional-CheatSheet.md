@@ -158,4 +158,25 @@ Textual | Show, Read
     * Imagine we have a system which tracks distance in both Kilometers, and Miles. We really don't want to mix Kilometers and Miles.
     * So in other words, we would like to give the compiler some embedded knowledge of the unit of distance that we are using. This is perfect for phantom types.
     * ![Distance with Phantom Units](imgs/PhantomDistance.png)
+    * We could make a data type to mimic pointers, and use phantom types to make it more safe
+    * e.g. `data Ptr a = MkPtr Addr`
+    * Give it some helpful functions: `peek :: Ptr a -> IO a` and `poke :: Ptr a -> a -> IO ()`
+    * And now this will be rejected by the compiler:<br>`do ptr <- allocate`<br>`poke ptr (42::Int)`<br>`bad::Float <- peek ptr`
+    * We can have polymorphism in phantom type parameters, seen [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Advanced%20Type%20Systems.pdf)
+  - **Existential Types**
+    * Lists are normally homogenous i.e. `data List a = Nil | Cons a (List a)`
+    * So the type checker rejects a list like `["foo","bar",12.3]` as *there is no single 'a' which can be universally quantified over the body of the list.*
+    * But by rejigging the definition of list we can put the quantifier inside the declaration...
+    * instead of `data forall a . HList a = ...` we can say `data HList = HNil | forall a . HCons a HList`
+    * **This is called existential quantification.**
+    * We can see from the data type that the existential type doesn't appear in the result type i.e. the constructor produces `HList` (no `a` in the type!)
+    * This comes with quite a few problems... For example, `show` won't be able to find an instance for a type `a` which works for a heterogenous type (because one type can't be many types.. huh)
+    * A workaround exists: make our list hold tuples, containing the data and useful functions to make the data usable
+    * E.g. if we wanted to print the data we could redefine our list: `data HList = HNil | forall a. HCons (a, a -> String) HList`
+    * so an example list might look like: `f = HCons ("foo", id) (HCons ("bar", id) (HCons (12.3, show) HNil))`
+    * This is pretty nasty though - it looks bloated. **Use a type class system: `data HList = HNil | forall a. Show a => HCons a HList`**
+    * This lets us create a list where the only guarantee for each element in the list, is that it is of a type which has some property `Show`.
+    * **So Existential Quantification is a way to 'squash' a group of types into a single type.** For example, our definition of `HList` earlier can 'squash' the types `String`, `Int`, and `Bool` into a single type, `a` (which has the restriction `Show a => a`).
+  - **Generalized Algebraic Data Types (GADTs)**
+    *
   
