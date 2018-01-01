@@ -178,5 +178,29 @@ Textual | Show, Read
     * This lets us create a list where the only guarantee for each element in the list, is that it is of a type which has some property `Show`.
     * **So Existential Quantification is a way to 'squash' a group of types into a single type.** For example, our definition of `HList` earlier can 'squash' the types `String`, `Int`, and `Bool` into a single type, `a` (which has the restriction `Show a => a`).
   - **Generalized Algebraic Data Types (GADTs)**
-    *
-  
+    * ["A generalization of the algebraic datatypes that you are familiar with."](https://en.wikibooks.org/wiki/Haskell/GADT)
+    * **They allow you to explicity write down the types of the constructors.**
+    * Primarily used for implementing DSLs. Examples of Arithmetic expression DSLs motivating GADTs can be found [here](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Advanced%20Type%20Systems.pdf), and [here](https://en.wikibooks.org/wiki/Haskell/GADT).
+    * To summarise the impact of GADTs: in Haskell, the constructor functions for `Foo a` have `Foo a` as their return type (e.g. `Nothing :: Maybe a`, `Just :: a -> Maybe a`). By using GADTs we can specify what type of `Foo` we want to return. (e.g. a constructor `I Int` of `Expr a` in an expression language represents integers, will have the type `I :: Int -> Expr a`. Using GADTs we can specify, as we would probably need/like to, that `I Int` has the type `I :: Int -> Expr Int`).
+  - **Type Kinds**
+    * Need to understand the concept of type kinds before going onto data kinds.
+    * The kind of a type is essentially the type of a type.
+    * E.g. the type of `Int` is `*`, `Char :: *`, `[Int] :: *`... `Maybe :: * -> *`, `[] :: * -> *`, `StateT :: * -> (* -> *) -> * -> *`
+    * So the kind of a type can be seen to tell us how many type arguments need to be supplied to produce a type.
+    * This is obviously brief, more info [here](https://en.wikibooks.org/wiki/Haskell/Kinds) although it is through C++ for some reason, so [maybe this is better](https://stackoverflow.com/questions/20558648/what-is-the-datakinds-extension-of-haskell).
+  - **Data Kinds**
+    * The Data Kinds extension makes the kind system of Haskell extensible! 
+    * So when we enable this extension, we **introduce a new type for each constructor, and a kind for each type**
+    * In other words, given a peano number system declaration, `data Nat = Z | S Nat`, the datakinds extension will introduce the new kind `Nat`, and provides us with the types: `S :: Nat -> Nat`, and `Z :: Nat` 
+    * So we can combine DataKinds with GADTs to do some useful things
+    * For example: given our `Nat` definition from before, we can say: <br>`data Vec :: Nat -> * where`<br>`Nil :: Vec Z`<br>`Cons :: Int -> Vec n -> Vec (S n)`
+    * But now when we create vectors, we end up with unusual types: <br>`vec1 :: Vector Integer (S (S (S Z)))`<br>```vec1 = 1 `Cons` (2 `Cons` (3 `Cons` Nil))```
+    * So given that the length is now encoded in the type of the vector, we need to write useful functions in a new way...
+    * E.g. `append` should stipulate that the length of the resulting vector is the sum of the argument vector lengths
+    * **The TypeFamilies extension gives us type level functions**
+    * So what we want to say is: `append :: Vector a x -> Vector a y -> Vector a (x+y)` (remember, x and y are of type `Nat`, not `Int`)
+    * Define a type family for the addition operation: `type family Add (x :: Nat) (y :: Nat) :: Nat`
+    * So we are saying "There is a type-level operation, Add, that I can define"...
+    * `type instance Add Z y = y`<br>`type instance Add (S x) y = S (Add x y)`
+    * So now what is the type of `append`?<br>`append :: Vector a x -> Vector a y -> Vector a (Add x y)`
+    * And we implement it as:<br>```append (Cons x xs) ys = x `Cons` (append xs ys)```<br>`append Nil ys = ys`
