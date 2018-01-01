@@ -142,6 +142,45 @@ Textual | Show, Read
 
 ### Parallelism
 
+  - A natural fit in functional programming due to immutable data, and side-effect free computation
+  - While we have no worry of deadlocks, starvations, synchronization, and locks, we have to pay attention to execution granularity
+  - `Control.Parallel` library gives us access to necessary functions to invoke some parallelism
+  - **`par :: a -> b -> b`** - `par x y` is semantically equivalent to `y` but we are hinting that parallelism may be possible here
+  - **`pseq :: a -> b -> b`** - `pseq x y` semantically means evaluate `x` before `y`, returning `y`
+    * So to calculate fibonacci numbers, we might say: <br>`fib n | n < 2 = 1`<br>`fib n = par nf1 (pseq nf2 (nf1 + nf2))`<br>`where nf1 = fib (n-1)`<br>`nf2 = fib (n-2)`
+    * Which can be read as *"evaluate nf1 while at the same time/in parallel (evaluate nf2, followed by nf1+nf2)"*
+    * Overheads would become an issue for a large n, an example of how to limit the thread count can be found [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Parallelism.pdf)
+  - **The Eval Monad**
+    * `Control.Parallel` has more to it
+    * **Facilitates the separation of algorithm and evaluation strategies**
+    * The Eval monad is to the Identity monad, as `par` is to the identity function
+    * `runEval :: Eval a -> a`<br>`rpar :: a -> Eval a` - my argument could be evaluated in parallel<br>`rseq :: a -> Eval a` - evaluate my argument and wait for the result
+    * `fib d n = runEval $ do`<br>`nf1 <- rpar $ fib (d-1) (n-1)`<br>`nf2 <- rseq $ fib (d-1) (n-2)`<br>`return $ nf1 + nf2`
+  - `Control.Parallel.Strategies` provides many utilities for exploiting parallelism
+    * Strategies for specifying strictness (i.e. playing the role of `seq`)
+    * Higher level functions for applying `parList`, `parListChunk`, etc. which can model algorithms like map-reduce
+  - **Example of Strategy Application**
+    * Given a sudoku solver: `solve :: String -> Maybe Grid`
+    * **Sequential**<br><img src="imgs/sudoku_solver_seq.png" alt="Sequential Implementation" width="400"/>
+    * **Basic Parallelism**<br><img src="imgs/sudoku_solver_basic_par.png" alt="Basic Parallelism Implementation" width="400"/>
+    * Our basic parallelism is more efficient but maybe we could make further improvements...
+    * **Building Eval Monad utilities**<br><img src="imgs/sudoku_solver_par.png" alt="More Efficient Parallelism" width="400"/>
+    * ParallelMap simply performs a parallel mapping of the solver method onto each element in the list
+  - `Control.Parallel.Strategies` gives us `Strategy`, which represents a parameterized hof to capture attempts to introduce parallelism
+    * `type Strategy a = a -> Eval a`
+  - Example strategy: evaluate pairs in parallel
+    * `parPair :: Strategy (a,b)`<br>`parPair (a,b) = do a' <- rpar a`<br>`b' <- rpar b`<br>`return (a',b')`
+  - We can then apply these strategies by creating a function `using`:
+    * `using :: a -> Strategy a -> a`<br> ```x `using` s = runEval (s x)```
+  - The Strategies are parameterised allowing us to do things like...
+    * Make multiple pairwise evaluation strategies using a h.o.f
+    * (This is desugared do notation for practice)<br>`evalPair :: Strategy a -> Strategy b -> Strategy (a,b)`<br>`evalPair sa sb (a,b) = sa a >>= \a' -> sa b >>= \b' -> return (a',b')`
+    * This function takes two strategies and a pair of values, and returns the application of the strategies to the values (would still need runEval to compute however). By using partial application we can build new strategies with this:<br>`parPair = evalPair rpar rpar`<br>`parSeqPair = evalPair rpar rseq`<br>And simply evaluate them... `runEval $ parPair (f x,f y)`
+    * Similarly we have: `evalList :: Strategy a -> Strategy [a]`<br>`evalList s [] = return []`<br>`evalList s (x:xs) = s x >>= \x' -> evalList s xs >>= \xs' -> return (x':xs')`
+    * We can also use the provided `rparWith` function of type `Strategy a -> Strategy a`, which wraps an `rpar` around its argument strategy.
+    * So we could define this:<br>`parList :: Strategy a -> Strategy [a]`<br>`parList s = evalList (rparWith s)`
+    * We could have defined our sudoku solver as: ```let solutions = map solve puzzles `using` parList rseq```
+    
 ### Concurrency
 
 ### Embedded DSLs
