@@ -183,6 +183,112 @@ Textual | Show, Read
     
 ### Concurrency
 
+  - Concurrency introduces the risk of non-determinism due to the interleaving of threads
+  - The basic primitives for threads are very simple:
+    * Spawn a new thread: `forkIO :: IO () -> IO ThreadId` e.g. `forkIO (forever $ putChar 'o')`
+    * Kill a thread: `killThread :: ThreadId -> IO ()`
+    * Delay a thread: `threadDelay :: Int -> IO ()` (the `Int` param is the millisecond delay)
+    * So we could run two threads: `main = forkIO (forever $ putChar 'o') >> forkIO (forever $ putChar 'O') >> threadDelay (10^6)`
+  - **We need to get some form of interthread communication for most non-trivial applications**
+    * **Channel (Unbounded FIFO)**
+    * Permits writing whenever you like, but *reading will block until there is something to read*
+    * `newChan :: IO (Chan a)`<br>`writeChan :: Chan a -> a -> IO ()`<br>`readChan :: Chan a -> IO a`<br>`getChanContents :: Chan a -> IO [a]`<br>`isEmptyChan :: Chan a -> IO Bool`<br>`dupChan :: Chan a -> IO (Chan a)`
+    * Threads can use these channels to communicate
+    * E.g. `main = hSetBuffering stdout NoBuffering >> newChan >>= \c -> forkIO (worker c) >> forkIO (forever & putChar '*') >> readChan c`<br>`worker :: Chan Bool -> IO ()`<br>`worker c = mapM putChar "Printing all the chars" >> writeChan c True`
+    * The main function creates a thread to run the worker function in, and then the main creates a thread to print infinite '\*'s, the main thread then locks on its readChan request. The worker function prints each char from "Printing all the chars", and then writes True to the channel, at which point the main function can finish, killing all threads.
+    * **So Channels give us a nice way to communicate, but can create deadlocks.**
+    * Channels are typically used in Servers (Thread per connection), BG processes (data computed by a thread becomes available incrementally)
+  - **Chans aren't the basic communication primitive in Haskell...**
+  - **MVar**
+```haskell
+newEmptyMVar :: IO (MVar a) -- An MVar can either be empty or full
+takeMVar :: MVar a -> IO a -- calling `takeMVar` on an empty MVar will block
+putMVar :: MVar a -> a -> IO () -- calling `putMVar` on a full MVar will block
+```
+  * MVars can be used as a mutex for shared state, a one-item channel, or **they can be used to build larger abstractions, like Chan**
+  - **Building Channels from MVars**
+    * We need to mimic the properties of a channel...<br>*Block reads when empty*<br>*Allow writes at any point*
+    * First difference between an MVar and a Chan is that MVars only take a single item, so we need a list with some form of sequencing to reflect time...
+    * **A linked list of MVars**
+```haskell
+type Stream a = MVar (Item a)
+data Item a = Item a (Stream a)
+data Chan a = Chan (MVar (Stream a)) -- read pointer
+                   (MVar (Stream a)) -- write pointer
+
+newChan :: IO (Chan a)
+newChan = do
+  hole <- newEmptyMVar
+  readVar <- newMVar hole
+  writeVar <- newMVar hole
+  return (Chan readVar writeVar)
+```
+  * So to create a new Channel...<br>We create an empty `MVar`, hole.<br>We place hole into both pointers of the `Chan`, so when initialised the read and write pointers are pointing to the same empty `MVar`.<br>This successfully mirrors the behaviour of `Chan`.
+```haskell
+writeChan :: Chan a -> a -> IO ()
+writeChan (Chan _ writeVar) val = do
+  newhole <- newEmptyMVar
+  oldhole <- takeMVar writeVar
+  putMVar oldhole (Item val newhole)
+  putMVar writeVar newhole
+```
+  * Writing to a Channel...<br>It is easiest to understand if we use the first write instance.<br>We create a new `MVar`, newhole.<br>Then take the current `MVar` from `writeVar`, `oldhole` (in this instance of first write, this is also the hole of `readVar`).<br>Put the new value, `val`, and new `MVar`, `newhole`, into the old `MVar`, `oldhole` (in the first instance, this is the read pointer so it now has data).<br>Put the `newhole` into the writeVar, so the write end of the `Chan` is still empty.
+```haskell
+readChan :: Chan a -> IO a
+readChan (Chan readVar _) = do
+  stream <- takeMVar readVar
+  Item val new <- readMVar stream -- note the use of readMVar here - we don't need to take it, just get its contents
+  putMVar readVar new
+  return val
+```
+  * Reading from a channel...<br>Take the `MVar` from the `readVar` (the value at the reader pointer).<br>Take the `MVar` stored within it (Recall `Item`, `Stream` definitions - `val` = information, next = next `MVar`).<br>Put new into `readVar` to move the pointer on.<br>Return the information that we saw.
+```haskell
+dupChan :: Chan a -> IO (Chan a)
+dupChan (Chan _ writeVar) = do
+  hole <- takeMVar writeVar
+  putMVar writeVar hole
+  newReadVar <- newMVar hole
+  return (Chan newReadVar writeVar)
+```
+  * Duplicate the channel, the aim of this function is to create a second channel which shares the `writeVar` but has a separate read pointer.<br>Take the `MVar` in `writeVar`, `hole`.<br>Place the `MVar` back into the `writeVar`, and then create a new `readVar` using the same `MVar`, `hole`. (As `writeVar` will always refer to an empty `MVar`, this works).<br>Return a new `Chan` with the `newReadVar` and same `writeVar`.
+
+```haskell
+unGetChan :: Chan a -> a -> IO ()
+unGetChan (Chan readVar _) val = do
+  newReadEnd <- newEmptyMVar
+  readEnd <- takeMVar readVar
+  putMVar newReadEnd (Item val readEnd)
+  putMVar readVar newReadEnd
+```
+  * This function puts a value in from the read end of the `Chan`.
+  * What happens in an empty `Chan`?
+    * `takeMVar` would block, and if this were not the case, an empty MVar would be pushed into the list.
+  - **STM - Software Transactional Memory**
+  - STM tries to solve the problems of shared-memory concurrent programs - locks, races, deadlocks, etc.
+  - STM borrows the concept of transactions from DBs - **atomic computation**.
+  - Using `atomically $ do`
+    - Atomic blocks of code will commit in an all or nothing way.
+    - Isolated execution, and no deadlocking (can generate exceptions however).
+    - **How? Optimistic Concurrency**
+    - Execute our code, lock free and log all memory accesses without executing them. At the end, commit the log, retrying blocks on failure.
+    - Code within a transaction is unaware of changes made by any other transaction - *So when two transactions are executing concurrently, the first to complete is commited, and the second will see conflict on completion, and retry.*
+  - **Too good to be true? There are some restrictions.**
+    - We cannot have side-effects within our atomic blocks.
+    - We cannot touch any transaction variables outside of an atomic block.
+  - **Type system helps us out here...**
+    - `Atomically :: STM a -> IO a`
+    - `STM` monad actions have side-effects, but they are more limited than the `IO` ones
+    - Mainly reading and writing special transaction variables, `Tvar`s
+```haskell
+newTVar :: a -> STM (TVar a)
+readTVar :: TVar a -> STM a
+writeTVar :: TVar a -> a -> STM ()
+```
+  - Semantically, a `TVar` is a value container. **Note: They do not have the same blocking semantics as MVars.**
+  - The type sysytem doesn't allow the execution of `STM` actions outside of an `atomically` or the `STM` monad
+  
+  
+
 ### Embedded DSLs
 
 ### Implementing Type Inference
