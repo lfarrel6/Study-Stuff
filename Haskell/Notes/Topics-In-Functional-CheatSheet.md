@@ -194,13 +194,16 @@ Textual | Show, Read
     * In other words, given a peano number system declaration, `data Nat = Z | S Nat`, the datakinds extension will introduce the new kind `Nat`, and provides us with the types: `S :: Nat -> Nat`, and `Z :: Nat` 
     * So we can combine DataKinds with GADTs to do some useful things
     * For example: given our `Nat` definition from before, we can say: <br>`data Vec :: Nat -> * where`<br>`Nil :: Vec Z`<br>`Cons :: Int -> Vec n -> Vec (S n)`
-    * But now when we create vectors, we end up with unusual types: <br>`vec1 :: Vector Integer (S (S (S Z)))`<br>```vec1 = 1 `Cons` (2 `Cons` (3 `Cons` Nil))```
+    * But now when we create vectors, we end up with unusual types: <br>`vec1 :: Vec Integer (S (S (S Z)))`<br>```vec1 = 1 `Cons` (2 `Cons` (3 `Cons` Nil))```
     * So given that the length is now encoded in the type of the vector, we need to write useful functions in a new way...
     * E.g. `append` should stipulate that the length of the resulting vector is the sum of the argument vector lengths
     * **The TypeFamilies extension gives us type level functions**
-    * So what we want to say is: `append :: Vector a x -> Vector a y -> Vector a (x+y)` (remember, x and y are of type `Nat`, not `Int`)
+    * So what we want to say is: `append :: Vec a x -> Vec a y -> Vec a (x+y)` (remember, x and y are of type `Nat`, not `Int`)
     * Define a type family for the addition operation: `type family Add (x :: Nat) (y :: Nat) :: Nat`
     * So we are saying "There is a type-level operation, Add, that I can define"...
     * `type instance Add Z y = y`<br>`type instance Add (S x) y = S (Add x y)`
-    * So now what is the type of `append`?<br>`append :: Vector a x -> Vector a y -> Vector a (Add x y)`
+    * So now what is the type of `append`?<br>`append :: Vec a x -> Vec a y -> Vec a (Add x y)`
     * And we implement it as:<br>```append (Cons x xs) ys = x `Cons` (append xs ys)```<br>`append Nil ys = ys`
+  - **Dependent Types**
+    * There are no *real* dependent types in Haskell, however the Vector example above is a simulation of type dependency - the vector type depends on the value of length, and functions can reject the vector based on the value.
+    * For example, we could implement a function `safeHead` to remove the first item of the list safely. If we give `safeHead` the following type signature, then any empty vectors would be rejected: `safeHead :: Vec a (S n) -> a`
