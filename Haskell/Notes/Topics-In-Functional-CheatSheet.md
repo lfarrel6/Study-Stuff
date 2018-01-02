@@ -417,6 +417,111 @@ readEitherTChan a b = fmap Left (readTChan a) `orElse` fmap Right (readTChan b)
 
 ### Embedded DSLs
 
+  - **Domain Specific Languages**
+  - Refers to a small, not-general purpose language which captures a specific problem domain e.g. SQL, TEX, etc.
+    - Should maintain the semantics of the domain - i.e. someone familiar with the domain, should already know the semantics of the language
+  - DSLs make programs which are...
+    - Concise in writing and easily maintained
+    - Easy to reason about
+    - Something that can be maintained by non-programmers
+  - But...
+    - Language design is hard - people want lots of featrues, good performance
+    - We could cave in and end up with lots of lexers, parsers, type checkers etc.
+  - **Types of language embedding**
+    - **Shallow**: DSL programs represented as values in the host language (e.g. functions), fixed semantics, may consist of calls to library functions
+    - **Deep**: Represent DSL programs as values in the host language but **keeps the abstraction**, **Use of h.o.fs to piece together programs, may consist of constructing a value which describes a program and is fed to an interpreter.**
+  - A DSL for images...
+  - Most basic element in any image is a shape...
+```haskell
+data Shape = ...
+empty, circle, square :: Shape
+```
+  - We need to reason about the position/size of these shapes... So we need to represent coordinates and vectors:
+```haskell
+data Vector = Vector Double Double
+type Point  = Vector
+```
+  - So now we may want to make use of the information to move and deform the shapes...
+```haskell
+data Transform = ...
+identity :: Transform
+translate :: Vector -> Transform
+scale :: Vector -> Transform
+rotate :: angle -> Transform
+compose :: Transform -> Transform
+
+(<+>) = compose
+```
+  - Now we can draw something... `type Drawing = [(Transform,Shape)]`
+  - And we need an interpretation function for our drawings - perhaps ask if each point is within the drawing: `inside :: Point -> Drawing -> Bool`
+  - Now for the actual implementation
+  - **Shallow** - Easier to get up and running, harder to extend
+```haskell
+type Shape = Point -> Bool
+
+inside :: Point -> Drawing -> Bool
+
+-- For Shapes
+circle = \(Vector x y) -> x ^ 2 + y ^ 2 <= 1
+
+-- Transformations apply to points
+translate (Vector tx ty) = \(Vector px py) = Vector (px - tx) (py - ty)
+
+-- And then we provide an interface
+inside1 :: Point -> (Transform,Shape) -> Bool
+inside1 p (t,s) = s . t p
+
+inside :: Point -> Drawing -> Bool
+inside p d = or $ map (inside1 p) d
+```
+  - **Deep** - more complicated to set up, easier to optimise and add to
+```haskell
+data Vector = Vector Double Double
+type Point  = Vector
+
+data Shape = Empty
+           | Circle
+           | Square
+             deriving Show
+             
+empty  = Empty
+square = Square
+circle = Circle
+
+data Transform = Identity
+               | Translate Vector
+               | Scale Vector
+               | Compose Transform Transform
+               | Rotate Matrix
+                 deriving Show
+                 
+data Matrix = Matrix Vector Vector
+
+-- provide some transformation constructors
+translate = Translate
+rotate angle = Rotate $ matrix (cos angle) (-sin angle) (sin angle) (cos angle)
+
+-- All heavy lifting in a Deep Embedding is carried out by the interpretation functions
+
+transform :: Transform -> Point -> Point
+transform (Translate (Vector tx ty)) (Vector px py) = Vector (px - tx) (py - ty)
+transform (Rotate m)                              p = (invert m) `mult` p
+
+invert :: Matrix -> Matrix
+mult :: Matrix -> Vector -> Vector
+
+inside :: Point -> Drawing -> Bool
+inside p d = or $ map (inside 1 p) d
+
+inside1 :: Point -> (Transform, Shape) -> Bool
+inside1 p (t,s) = insides (transform t p) s
+
+insides :: Point -> Shape -> Bool
+p `insides` Empty = False
+p `insides` Circle = distance p <= 1
+p `insides` Square = maxnorm  p <= 1
+```
+
 ### Implementing Type Inference
 
 ### Advanced Type Systems
