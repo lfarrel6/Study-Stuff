@@ -7,7 +7,7 @@
   - [Parallelism](#parallelism)
   - [Concurrency](#concurrency)
   - [Embedded DSLs](#embedded-dsls)
-  - [Implementing Type Inference](#implementing-type-inference)
+  - [~Implementing Type Inference~](#implementing-type-inference)
   - [Advanced Type Systems](#advanced-type-systems)
   
 ### Monads
@@ -522,7 +522,15 @@ p `insides` Circle = distance p <= 1
 p `insides` Square = maxnorm  p <= 1
 ```
 
-### Implementing Type Inference
+### ~Implementing Type Inference~
+
+  - If you are looking for type inference notes, I have them [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Type%20Inference.pdf)
+  - ~Brief outline of the important bits (based off of my gut instincts around the topic).~
+  - ~Haskell has **Polymorphic typing** (types can be universally quantified over sets of type variables), and the compiler is capable of **automatic type inference.**~
+  - ~Type inference drives the type checker's ability to verify if a program is well typed, and if so determine the type.~
+  - ~**A type inference system is regarded as 2 separate but related things:**~
+    - ~**A set of inference rules**~
+    - ~**An inference algorithm to deduce types**~
 
 ### Advanced Type Systems
 
