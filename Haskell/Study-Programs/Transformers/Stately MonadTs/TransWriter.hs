@@ -27,7 +27,9 @@ instance (Monad m, Monoid w) => Monad (TransWriter w m) where
    return (a',w `mappend` w')
 
 instance Monoid w => MonadTrans (TransWriter w) where
-  lift = TransWriter . liftM (\x -> (x,mempty))
+  lift m = TransWriter $ do
+    m' <- m
+    return (m',mempty)
 
 instance (Monoid w, Monad m) => MonadWriter w (TransWriter w m) where
   tell w = TransWriter $ return ((),w)

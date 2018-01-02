@@ -30,7 +30,9 @@ instance Monad m => Monad (TransState s m) where
    runTransState (f2 a) s'
 
 instance MonadTrans (TransState s) where
-  lift m = TransState $ \s -> liftM (\x -> (x,s)) m
+  lift m = TransState $ \s -> do
+    m' <- m
+    return (m',s)
 
 instance Monad m => MonadState s (TransState s m) where
   get = TransState $ \s -> return (s,s)
