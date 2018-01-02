@@ -27,7 +27,9 @@ instance Monad m => Monad (TransError e m) where
       Left  _   -> return x'
 
 instance MonadTrans (TransError e) where
-  lift = TransError . liftM Right
+  lift m = TransError $ do
+    m' <- runTransError
+    return $ Right m'
 
 instance Monad m => MonadException e (TransError e m) where
   throw = TransError . return . Left

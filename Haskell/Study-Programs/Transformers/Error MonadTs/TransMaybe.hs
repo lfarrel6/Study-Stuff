@@ -27,7 +27,9 @@ instance Monad m => Monad (TransMaybe m) where
      Just x  -> runTransMaybe $ k x
 
 instance MonadTrans TransMaybe where
-  lift = TransMaybe . liftM Just
+  lift m = TransMaybe $ do
+    m' <- runTransMaybe m
+    return $ Just m'
 
 instance Monad m => MonadError (TransMaybe m) where
   eFail   = TransMaybe $ return Nothing

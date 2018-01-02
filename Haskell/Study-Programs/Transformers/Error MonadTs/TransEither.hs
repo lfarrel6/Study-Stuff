@@ -27,7 +27,9 @@ instance (Monad m) => Monad (TransEither l m) where
       Right result -> runTransEither $ y result
 
 instance MonadTrans (TransEither l) where
-  lift = TransEither . liftM Right
+  lift m = TransEither $ do
+    m' <- runTransEither
+    return $ Right m'
 
 instance (Show l, Monad m) => MonadError l (TransEither l m) where
   eFail l = TransEither $ return $ Left l
