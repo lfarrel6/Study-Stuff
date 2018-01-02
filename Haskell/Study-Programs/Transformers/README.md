@@ -3,7 +3,7 @@
 ## Transformer List
 
 - [x] EitherT
-- [ ] ErrorT
+- [x] ErrorT
 - [x] MaybeT
 - [ ] ReaderT
 - [x] StateT
