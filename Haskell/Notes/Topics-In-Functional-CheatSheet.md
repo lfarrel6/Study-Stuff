@@ -130,11 +130,19 @@ Textual | Show, Read
     * Using a type like `IO (Maybe a)` would work, but would force us to pattern match in do blocks even though the maybe monad provides that feature.
   - So we use Monad transformers to to handle this composition
     * **We use transformers to combine/mix desired effects from different monads.**
-    * `class Monad m => Err m where`<br>`eFail :: m a`<br>`eHandle :: m a -> m a -> m a`<br>**For a monad `m`, we can transform it into a monad which maintains the effects of `m`, but can also error handle using `eFail` and `eHandle`**
+```haskell
+class Monad m => Err m where
+  eFail :: m a
+  eHandle :: m a -> m a -> m a
+```
+  * **For a monad `m`, we can transform it into a monad which maintains the effects of `m`, but can also error handle using `eFail` and `eHandle`**
     * To make it useful, we define a way to access the operations of `m`
-    * `class (Monad m, Monad (t m)) => MonadTransformer t m where`<br>`lift :: m a -> t m a`
-    * `lift` allows us to bring a monadic computation (of the `m` monad) into the context of our transformer, `t`
-    * There is an example concrete instance ErrTM [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Monad%20Transformers.pdf)
+```haskell
+class (Monad m, Monad (t m)) => MonadTransformer t m where
+  lift :: m a -> t m a
+```
+  * `lift` allows us to bring a monadic computation (of the `m` monad) into the context of our transformer, `t`
+  * There is an example concrete instance ErrTM [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Monad%20Transformers.pdf)
   - Haskell provides monad transformers in several libraries, we looked at the mtl library in the course
     * The mtl library requires any monad transformer to be an instance of the type class `MonadTrans` (which simply provides `lift`)
     * Then, to provide any compatability, the transformer must become an instance of the type class of any monad with which it is compatible e.g. `MonadState`
@@ -147,15 +155,30 @@ Textual | Show, Read
   - `Control.Parallel` library gives us access to necessary functions to invoke some parallelism
   - **`par :: a -> b -> b`** - `par x y` is semantically equivalent to `y` but we are hinting that parallelism may be possible here
   - **`pseq :: a -> b -> b`** - `pseq x y` semantically means evaluate `x` before `y`, returning `y`
-    * So to calculate fibonacci numbers, we might say: <br>`fib n | n < 2 = 1`<br>`fib n = par nf1 (pseq nf2 (nf1 + nf2))`<br>`where nf1 = fib (n-1)`<br>`nf2 = fib (n-2)`
-    * Which can be read as *"evaluate nf1 while at the same time/in parallel (evaluate nf2, followed by nf1+nf2)"*
-    * Overheads would become an issue for a large n, an example of how to limit the thread count can be found [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Parallelism.pdf)
+    * So to calculate fibonacci numbers, we might say: 
+```haskell
+fib n | n < 2 = 1
+fib n = par nf1 (pseq nf2 (nf1 + nf2))
+  where nf1 = fib (n-1)
+        nf2 = fib (n-2)
+```
+  * Which can be read as *"evaluate nf1 while at the same time/in parallel (evaluate nf2, followed by nf1+nf2)"*
+  * Overheads would become an issue for a large n, an example of how to limit the thread count can be found [here.](https://github.com/lfarrel6/Study-Stuff/blob/master/Haskell/Notes/Parallelism.pdf)
   - **The Eval Monad**
     * `Control.Parallel` has more to it
     * **Facilitates the separation of algorithm and evaluation strategies**
     * The Eval monad is to the Identity monad, as `par` is to the identity function
-    * `runEval :: Eval a -> a`<br>`rpar :: a -> Eval a` - my argument could be evaluated in parallel<br>`rseq :: a -> Eval a` - evaluate my argument and wait for the result
-    * `fib d n = runEval $ do`<br>`nf1 <- rpar $ fib (d-1) (n-1)`<br>`nf2 <- rseq $ fib (d-1) (n-2)`<br>`return $ nf1 + nf2`
+```haskell
+runEval :: Eval a -> a
+rpar :: a -> Eval a -- my argument could be evaluated in parallel
+rseq :: a -> Eval a -- evaluate my argument and wait for the result
+```
+```haskell
+fib d n = runEval $ do
+  nf1 <- rpar $ fib (d-1) (n-1)
+  nf2 <- rseq $ fib (d-1) (n-2)
+  return $ nf1 + nf2
+```
   - `Control.Parallel.Strategies` provides many utilities for exploiting parallelism
     * Strategies for specifying strictness (i.e. playing the role of `seq`)
     * Higher level functions for applying `parList`, `parListChunk`, etc. which can model algorithms like map-reduce
@@ -169,9 +192,17 @@ Textual | Show, Read
   - `Control.Parallel.Strategies` gives us `Strategy`, which represents a parameterized hof to capture attempts to introduce parallelism
     * `type Strategy a = a -> Eval a`
   - Example strategy: evaluate pairs in parallel
-    * `parPair :: Strategy (a,b)`<br>`parPair (a,b) = do a' <- rpar a`<br>`b' <- rpar b`<br>`return (a',b')`
+```haskell
+parPair :: Strategy (a,b)
+parPair (a,b) = do a' <- rpar a
+  b' <- rpar b
+  return (a',b')
+```
   - We can then apply these strategies by creating a function `using`:
-    * `using :: a -> Strategy a -> a`<br> ```x `using` s = runEval (s x)```
+```haskell 
+using :: a -> Strategy a -> a
+x `using` s = runEval (s x)
+```
   - The Strategies are parameterised allowing us to do things like...
     * Make multiple pairwise evaluation strategies using a h.o.f
     * (This is desugared do notation for practice)<br>`evalPair :: Strategy a -> Strategy b -> Strategy (a,b)`<br>`evalPair sa sb (a,b) = sa a >>= \a' -> sa b >>= \b' -> return (a',b')`
