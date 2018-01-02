@@ -28,7 +28,7 @@ instance Monad m => Monad (TransMaybe m) where
 
 instance MonadTrans TransMaybe where
   lift m = TransMaybe $ do
-    m' <- runTransMaybe m
+    m' <- m
     return $ Just m'
 
 instance Monad m => MonadError (TransMaybe m) where
