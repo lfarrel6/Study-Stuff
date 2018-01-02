@@ -317,8 +317,103 @@ writeTVar :: TVar a -> a -> STM ()
 ```
   - Semantically, a `TVar` is a value container. **Note: They do not have the same blocking semantics as MVars.**
   - The type sysytem doesn't allow the execution of `STM` actions outside of an `atomically` or the `STM` monad
+  - **STM also provides some new concepts...**
+  - Retry
+    - *"Abandon and re-execute from the start"*
+    - Implementation blocks until a change is made to a transactional variable within the atomic block, at which point it will restart
+```haskell
+withdraw :: Account -> Int -> STM ()
+withdraw acc amount = do
+  bal <- readTVar acc
+  if bal < amount then retry
+  else writeTVar acc (bal - amount)
+```
+  - **We cannot nest uses of atomically**
+  - STM also provides the concept of **Compositional Choice**
+    - This is a very useful feature...
+```haskell
+orElse :: STM a -> STM a -> STM a
+
+atomically $ do withdraw a1 x `orElse` withdraw a2 x
+  deposit a3 x
+```
+  - We can also use the concept of **Invariants**
+    - This lets us maintain a pool of invariants to check after each transaction
+    - *If an invariant is broken, the transaction is retried.*
+    - `always :: STM Bool -> STM ()`
+```haskell
+newAccount = do
+  v <- newTVar 0
+  always $ do cts <- readTVar v ; return (cts >= 0)
+  return v
+```
+  - **We cannot use IO actions within an atomic block**
+    - It would violate execution and atomicity e.g. if a withdraw function printed `"Bank balance is: " + <some_amount>` during its execution in the STM monad, this may be printed several times before the execution is actually completed. Even worse, one atomic block (A) could read in a value in an IO action which was changed by another thread (B), and B could fail while A succeeds, making the system incorrect.
   
+**Making Channels with STMs**
+```haskell
+newTChan :: STM (TChan a)
+writeTChan :: TChan a -> a -> STM ()
+readTChan :: TChan a -> STM a
+
+data TChan a = TChan (TVar (TVarList a)) -- read pointer
+                     (TVar (TVarList a)) -- write pointer
+
+type TVarList a = TVar (TList a)
+data TList a = TNil | TCons a (TVarList a)
+
+newTChan :: STM (TChan a)
+newTChan = do
+  hole  <- newTVar TNil
+  read  <- newTVar hole
+  write <- newTVar hole
+  return (TChan read write)
   
+readTChan :: TChan a -> STM a
+readTChan (TChan readVar _) = do
+  listHead <- readTVar readVar
+  head <- readTVar listHead
+  case head of
+    TNil           -> retry -- note use of retry to implement blocking on a read
+    TCons val tail -> do
+      writeTVar readVar tail
+      return val
+      
+writeTChan :: TChan a -> a -> STM ()
+writeTChan (TChan _ writeVar) a = do
+  newListEnd <- newTVar TNil              -- create a new empty TVar with an empty list in it
+  listEnd    <- readTVar writeVar         -- read in the current TVar of the writeVar
+  writeTVar writeVar newListEnd           -- put the newListEnd into the writeVar
+  writeTVar listEnd (TCons a newListEnd)  -- Cons the newListEnd onto the end of listEnd 
+                                          -- This final step appends newListEnd onto the old listEnd, which can be thought of as a list of values for the read pointer
+                                          
+--TVars allow us to write a nice implementation of unGetTChan, which we struggled with before
+unGetTChan :: TChan a -> a -> STM ()
+unGetTChan (TChan readVar _) a = do
+  listHead <- readTVar readVar
+  newHead  <- newTVar (TCons a listHead)
+  writeTVar readVar newHead
+  
+--STMs let us write some other nice functions
+
+isEmptyTChan :: TChan a -> STM Bool
+isEmptyTChan (TChan read _) = do
+  listHead <- readTVar read
+  head     <- readTVar listHead
+  case head of
+    TNil  -> return True
+    TCons _ _ -> return False
+    
+readEitherTChan :: TChan a -> TChan b -> STM (Either a b)
+readEitherTChan a b = fmap Left (readTChan a) `orElse` fmap Right (readTChan b)
+```
+  - So STMs are useful
+    - Alternative to lock-based concurrency, providing **composable** atomicity, blocking and error handling
+    - The guarantee of composability means that working pieces will combine to a working system
+  - **Drawbacks**
+    - MVar concurrency is faster (usually - there are cases where a simplified STM solution may be faster)
+    - Cannot implement multi-way communication without abandoning compositionality
+    - **MVar based solutions guarantee fairness - MVar blocked threads woken in FIFO order, cannot be fair to TVar threads without abandoning composability**
 
 ### Embedded DSLs
 
