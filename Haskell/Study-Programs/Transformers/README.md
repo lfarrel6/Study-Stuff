@@ -5,6 +5,6 @@
 - [x] EitherT
 - [x] ErrorT
 - [x] MaybeT
-- [ ] ReaderT
+- [x] ReaderT
 - [x] StateT
 - [x] WriterT
