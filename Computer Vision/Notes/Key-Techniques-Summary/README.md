@@ -1,0 +1,1 @@
+# Key Points for the key approaches in computer vision
