@@ -33,7 +33,7 @@
 - Non-Linear Smoothing Transformations 
   - Define multiple masks/regions - need to choose size and shape - use the average of most homogeneous mask
   - For each point - calculate dispersion, assign output point average of mask with min dispersion
-  - ![NON-LINEAR SMOOTHING FORMULA](../imgs/non-linear-smoothing)
+  - ![NON-LINEAR SMOOTHING FORMULA](../imgs/non-linear-smoothing.png)
   - Iterative application: convergence.
   - Median Filter - use median value, ignore average, noise resistant, computationally expensive, damages lines
   - Bilateral Filter - weight local pixels, distance from centre, difference in colour/instensity, preserves edges, but causes staircase
