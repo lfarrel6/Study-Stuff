@@ -6,7 +6,14 @@
   - [Conversion formulae](#colour-conversion-formulae)
   - [Image noise](#image-noise)
 - [Histograms](#histograms)
+  - [Equalisation](#equalisation)
+  - [Histogram Comparison](#histogram-comparison)
+  - [Back Projection](#back-projection)
+  - [K-Means Clustering](#k-means-clustering)
 - [Binary](#binary)
+  - [Thresholding](#thresholding)
+  - [Alternative Thresholding](#alternative-thresholding)
+  - [Mathematical Morphology](#mathematical-morphology)
 - [Region Segmentation and Connectivity](#region-segmentation-and-connectivity)
 
 ## Images and Colour
