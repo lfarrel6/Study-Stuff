@@ -83,7 +83,7 @@
   - Result is **a probability image, p(i,j) indicating the similarity between f(i,j) and sample set**
   - Key considerations - size of hist bins (esp. when using limited sample set) & colour space
   
-#### K-Means  Clustering
+#### K-Means Clustering
 - Method to reduce the variation in 3D colour space
   - Algorithm detects k exemplars to best represent image (pre-determined k) - colours are associated with the nearest exemplar forming clusters
   - Approach:<br>**Get Starting exemplars** (random (leads to non. determinism)? manual selection? even distribution?)<br>**First Pass:** for all pixels, allocate to nearest exemplar - shift exemplar to c.o.g of assigned colours after each assignment<br>**Second Pass:** use final exemplars from first pass & realocate all pixels
@@ -159,8 +159,8 @@
   - **Kernel Density Estimation:** Given a sparse dataset, determine an estimate of density at each point - we use this to smooth the samples.
   - ![Kernel Density Estimation](../imgs/KernelDensityEst.png)
     - Where `n` is the number of samples, and `h` is the bandwidth
-  - For a multidimensional dataset:<br>![MultiDimensional KDE](../imgs/multidimensional-kde.png)
-  - Typically we use a uniform or Guassian kernel:<br>![Types of Kernels](../imgs/kernels.png)
+  - For a multidimensional dataset:<br>![MultiDimensional KDE](../imgs/multidimensional-KDE.png)
+  - Typically we use a uniform or Guassian kernel:<br><img alt="Types of Kernels" src="../imgs/kernels.png" height="200"/>
   - **The algorithm of meanshift:**<br>For each pixel: estimate KDE and the **mean shift vector**(direction of local increasing density), shift the particle to the new mean, recompute until stabilization<br>Pixels which end in the same location form a cluster, assign local mean.
   - **The kernel density estimate is calculated using points within a spatial and colour range.**<br>![Restricted KDE](../imgs/Restricted-KDE.png)
     - Requires a spatial and colour kernel - both can be gaussian, both limit and weight the considered points
