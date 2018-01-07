@@ -169,3 +169,77 @@
   - **Cons of Meanshift:** slow, selection of kernel is tricky
 - **Edge based**
   - Binary regions generally identified using edge detection
+
+## Geometric Transformations
+
+- Bring multiple images into a single frame of reference (mosaicing), remove distortion, simplify further processing
+- **Given a distorted image f(i,j) and a corrected image f(i',j'), we model the transformation as: i = T<sub>i</sub>(i',j') j = T<sub>j</sub>(i',j')**
+  - Note: that it works backwards - functions T<sub>i</sub> and T<sub>j</sub> take the corrected image coordinates and computes the corresponding images in the distorted image.
+- Information is required to define the transformation: can be known in advance(image to known), can be determined through observations between images(image to image).
+- So applying the transformation is: taking each point in the output image, determining where it comes from with T, interpolating its value
+- **Why in reverse? In the case of expansion, working forwards would leave gaps in the output.**
+
+#### Affine Transformations
+
+- Definition:<br>![Affine Transformations](../imgs/affine-transformations.png)
+#### Unknown Affine Transformations
+- Require at least 3 observations `(i0,j0)<=>(i0',j0') , (i1,j1)<=>(i1',j1') , (i2,j2) <=> (i2',j2')`
+  - The more observations, the greater the accuracy
+- Reorganise previous definition of affine transformations for three observations:<br>[Three Observation Affine](../imgs/3observation-affine.png)
+  - To compute the coefficients (`a` values), multiply both sides by inverse of the square matrix
+  - Given >3 observations the matrix won't be square, so we use the psuedo inverse
+
+#### Known Affine Transformations
+- **Translation**
+  - ![Affine Translation](../imgs/Affine-Translation.png)
+- **Rotation**
+  - ![Affine Rotation](../imgs/affine-rotation.png)
+- **Change of Scale**
+  - ![Affine Scale](../imgs/affine-scale.png)
+- **Skewing**
+  - ![Affine Skew](../imgs/affine-skew.png)
+- **Panoramic Distortion**
+  - ![Affine Panoramic Distortion](../imgs/affine-pandist.png)
+  
+#### Perspective Transformations
+- **Perspective Transformations are needed when a planar surface lies in a plane which is not parallel to the image plane**
+- ![Perspective Transformation](../imgs/perspective-definition.png)
+  - More complex thana affine transformation
+- **Requires at least 4 observations**
+- Can tell from given formula: <br>![Perspective I.W](../imgs/perspective-iw.png)<br>![Perspective W](../imgs/perspective-w.png)<br>![Perspective I](../imgs/perspective-i.png)<br>[Perspective J](../imgs/perspective-j.png)
+- Reorganising that gives us:<br>![Perspective Matrix]{../imgs/perspective-matrix.png)
+  - Multiplying by inverse of square matrix gives us coefficients
+  - >4 observations means we need to use psuedo inverse
+
+#### More Complex Transformations
+
+- Approximation by Polynomial - used in medical imaging combine images taken with different sensors
+  - ![Polynomial Approximation i](../imgs/polynomial-approx.png)<br>![Polynomial Approximation j](../imgs/polynomial-approxj.png)
+  - The number of observations required is half of the terms in the polynomial
+  - If a geometric transformation is too complicated, we can partition the image, and determine a transformation per partition
+
+#### Brightness Interpolation
+
+- The mapping from corrected image to real image is not on a per pixel basis i.e. the corrected image maps back to *real coordinates*
+- The value at each pixel is interpolated
+- **Three interpolation schemes**
+  - **Nearest Neighbour interpolation**
+  - `f'(i',j') = f(rounf(i),round(j))` - take the value from the nearest pixel in the original image - blocky effects
+  - **Bilinear interpolation**
+  - `f'(i',j') = (trunc(i)+1-i)(trunc(j)+1-j)f(trunc(i),trunc(j)) + (i-trunc(i))(trunc(j)+1-j)f(trunc(i)+1,trunc(j)) + (trunc(i)+1-i)(j-trunc(j))f(trunc(i),trunc(j)+1) + (i-trunc(i))(j-trunc(j))f(trunc(i)+1,trunc(j)+1)`
+  - Assumes brightness is bilinear - average brightness about the point (trunc(i),trunc(j)), weighted with their distance - blurs the image
+  - **Bicubic interpolation**
+  - Approximate the brightness using a bi-cubic polynomial surface - accounts for the 16 neighbouring pixels so no blurring
+  - Similar to laplacian
+
+#### Camera Models - Removing Distortion
+
+- **Radial Distortion**
+  - Two Forms
+  - Barrel Distortion - radial distortion where magnification decreases as distance from optical axis increases
+  - Pincushion Distortion - radial distortion where magnification increases as distance from optical axis increases
+  - ![radial distortion i](../imgs/radial-distortion-i.png)<br>![radial distortion j](../imgs/radial-distortion-j.png)<br>![radial distortion r](../imgs/radial-distortion-r.png)
+- **Tangential Distortion**
+  - Caused by uneven magnification from one side to the other in an image i.e. lens not parallel to image plane
+  - ![tangential distortion i](../imgs/tangential-distortion-i.png)<br>![tangential distortion j](../imgs/tangential-distortion-j.png)
+  - Where p<sub>1</sub> and p<sub>2</sub> are parameters describing the distortion.
