@@ -15,6 +15,18 @@
   - [Alternative Thresholding](#alternative-thresholding)
   - [Mathematical Morphology](#mathematical-morphology)
 - [Region Segmentation and Connectivity](#region-segmentation-and-connectivity)
+  - [Connectivity](#connectivity)
+  - [Segmentation](#segmentation)
+    - [Region Based](#region-based)
+    - [Edge Based](#edge-based)
+- [Geometric Transformations](#geometric-transformations)
+  - [Affine Transformations](#affine-transformations)
+  - [Unknown Affine Transformations](#unknown-affine-transformations)
+  - [Known Affine Transformations](#known-affine-transformations)
+  - [Perspective Transformations](#perspective-transformations)
+  - [More Comlpex Transformations](#more-complex-transformations)
+  - [Brightness Interpolation](#brightness-interpolation)
+  - [Removing Camera Distortion](#camera-models---removing-distortion)
 
 ## Images and Colour
 
@@ -151,6 +163,7 @@
 
 #### Segmentation
 - Split image into smaller parts, preferably corresponding to particular objects
+
 ##### Region based
 - **Watershed segmentation:** identify all regional minima - label as different regions - flood from minima to extend the regions - point of confluence between regions is a watershed line.
   - Minimum of what? Greyscale values/Inverse of Gradient/Inverse of Chamfer Distance
@@ -167,7 +180,8 @@
   - We calculate our **mean shift vector** as:<br>![Mean shift vector](../imgs/meanshift-vector.png)
   - **Pros of Meanshift:** don't need to know the number of clusterns, accounts for spatial and colour differences
   - **Cons of Meanshift:** slow, selection of kernel is tricky
-- **Edge based**
+
+##### Edge based
   - Binary regions generally identified using edge detection
 
 ## Geometric Transformations
@@ -209,7 +223,7 @@
 - Can tell from given formula: <br>![Perspective I.W](../imgs/perspective-iw.png)<br>![Perspective W](../imgs/perspective-w.png)<br>![Perspective I](../imgs/perspective-i.png)<br>[Perspective J](../imgs/perspective-j.png)
 - Reorganising that gives us:<br>![Perspective Matrix]{../imgs/perspective-matrix.png)
   - Multiplying by inverse of square matrix gives us coefficients
-  - >4 observations means we need to use psuedo inverse
+  - Given >4 observations means we need to use psuedo inverse
 
 #### More Complex Transformations
 
