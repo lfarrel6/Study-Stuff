@@ -387,7 +387,7 @@
     - Orientations are quantised to 8 values (compass points), use this info to compare an edge pixel to the pixel 'ahead' and 'behind' of the current one.
 - **2nd Derivative Edge Detection**
   - **Laplace operator**
-  - ![laplace](../img/laplace.png)
+  - ![laplace](../imgs/laplace.png)
   - High weighting of the central pixel makes this approach susceptible to noise, so follow with smoothing
 - 2nd Derivative Edge Detectors find the edges without orientation - location and gradient
   - **Gradient Magnitude = slope of zero crossing** - very computationally expensive, so use magnitude from first deriv
