@@ -27,6 +27,7 @@
   - [More Comlpex Transformations](#more-complex-transformations)
   - [Brightness Interpolation](#brightness-interpolation)
   - [Removing Camera Distortion](#camera-models---removing-distortion)
+- [Recognition](#recognition)
 
 ## Images and Colour
 
@@ -257,3 +258,104 @@
   - Caused by uneven magnification from one side to the other in an image i.e. lens not parallel to image plane
   - ![tangential distortion i](../imgs/tangential-distortion-i.png)<br>![tangential distortion j](../imgs/tangential-distortion-j.png)
   - Where p<sub>1</sub> and p<sub>2</sub> are parameters describing the distortion.
+
+## Recognition
+
+- Lets us see what is in an image
+
+#### Template Matching
+- **Basic Algorithm**
+  - Evaluate a match criterion for each possible position of the template in the image, search for local maxima above a threshold
+- **Matching Criteria**
+  - ![square differences](../imgs/square-diff.png)
+  - ![normalized square differences](../imgs/normalised-square-diff.png)
+    - **0 is optimal, 1 is worst**
+  - ![cross correlation](../imgs/cross-cor.png)
+  - ![normalized cross correlation](../imgs/norm-cross-cor.png)
+    - **0 is worst, 1 is optimal**
+  - Cross correlation ignores luminance
+  - Generally don't compute a value at the boundaries as the degree-of-fit will be inconsistent
+- **Control Strategies**
+  - Select greatest value in a local neighbourhood - typically use a neighbourhood of 8 - prevent duplicate matches
+  - Process using an image hierarchy - process at increasing resolutions - use matches at low res as a guide - inappropriate for detailed templates
+
+#### Chamfer Matching
+- Template matching requires very close matches - generally not possible (noise/orientation)
+- **Chamfer matching is an encoding for each pixel of its distance to the nearest object (edge)**
+  - Algorithm: For each point, if it is an edge point, set it's value to 0, else ignore.
+  - Iterate over every non edge point, finding the distance to the nearest edge.
+- The template in chamfer matching is a binary template in which only the object pixels are set and considered
+  - The metric is the sum of the overlapping values (0 is optimal)
+  
+#### Statistical Pattern Recognition (SPR)
+- Derive features from known objects, use the features to classify unknowns based on the similarity to this shape
+- Probability recall:<br>**Independent Events:** `P(AB) = P(A)P(B)`<br>**Dependent Events:** `P(AB) = P(A|B)P(B)`
+  - Use probability to give the probability that an object is of a class, Wi, given some features: `P(x|Wi)`
+  - Essentially a probability density function of a value occuring for that class
+- `P(x|Wi)` is the likelihood given the class (a-priori), but we care more about the probability of the class given some value: `P(wi|x)`
+- **Bayes Theorem:** For two classes A and B, the a-posteriori proabbility it: `P(B|A) = [P(A|B)P(B)]/P(A)`
+  - So, where Wi forms a partitioning of the event space: `[P(x|Wi)P(Wi)]/sum(P(x|Wi)P(Wi))`
+- **Example Features:** area, minboundingrect, convex hull, elongatedness, concavities, holes, perimeter length
+- **Advantages:** Accurate
+- **Disadvantages:** Needs training, requires decent training set
+
+#### Support Vector Machines (SVM)
+- Works for 2 class problem - considers 2 linearly seperable classes in n-dimensional feature space
+- Finds hyperplane of max-margin between the classes
+- Define separating hyperplanes: `w.x + b = 0 , w.x + b = 1 , w.x + b = -1`
+  - Constraint: ![Svm constraint](../imgs/SVM-constraint.png)
+  - Given a point x<sup>+</sup> on w.x+b=1 and x<sup>-</sup> is the nearest point on w.x+b=-1...
+  - Then: ![SVM derivation](../imgs/SVM-derivation.png)
+  - Multiply by w...: ![SVM derivation 2](../imgs/SVM-derivation2.png)
+  - Therefore: ![SVM conclusion](../imgs/SVM-conclusion.png)
+  - So we need to minimise |w| to maximise the separation, subject to our constraint: ![SVM constraint](../imgs/SVM-constraint.png)
+- **Lagrangian Optimisation**
+  - Can optimise (i.e. find minimum |w|) using Lagrangian optimisation
+   - ![Lagrangian Optimisation](../imgs/Lagrange-Optimisation.png)
+  - We find minimums by setting partial derivatives to 0
+- So we can now classify by passing an observed feature vector into the original equation, and classifying based on whether it is positive or negative
+  - If classes aren't linearly separable - replace dot products with a non-linear kernel, or use soft margin SVMs
+
+#### Cascade of Haar Classifiers (Haar)
+- Robust object detection using cascade of classifiers - only uses simple features (efficient)
+- Learns based on samples of positive and negative
+- Selects a large number of features during training and creates classifiers to accept/reject based off them
+  - Classifiers are ordered sequentially (cascade) - if a sub-image is rejected by any classifier, it is rejected
+  - **Efficient: Most sub-images are stopped by first or second classifier**
+- Classifiers are designed to resize easily
+- Features are determined as the difference of the sums of a number of rectangular regions
+  - Place mask in specific location, at specific scale
+  - Subtract the normalized sum of white pixels (white region of mask) from the normalized sum of black pixels (black region of mask)
+- **Training**
+  - Needs a large number of samples (positive and negative), calculates hundreds of thousands of possible features
+  - Selects the most important features, for specific points in the cascade
+- **Weak Classifiers:** combine a specific feature with a threshold, comparison to this threshold is the accept/reject decision
+- **Strong Classifiers:** Combine a number of weak classifiers using Adaboost.
+
+#### Principal Components Analysis (PCA)
+- Statistical Technique for data analysis, compression and recognition - analyses data covariance, identifying principal directions
+- Example: given 2D data, and N samples/vectors, find the mean sample, the direction of maximum covariance, and the direction orthogonal to this.
+- **Background - Eigenvalues and Eigenvectors**
+- Given a square matrix, A, the eigenvalues are the roots of the characteristic equation:
+  - ![eigenvalue](../imgs/eigenvalue.png)
+  - For each eigenvalue, there will be an eigenvector, x, such that: ![eigenvector](../imgs/eigenvector.png)
+- For an n\*n matrix, there will be n eigenvalues, consider n=2:
+  - There will be 2 eigenvalues, and 2 corresponding eigenvectors, such that:<br>![a](../imgs/2x2-eigens.png)<br>![b](../imgs/2x2-eigens2.png)
+  - ![PCA derivation](../imgs/PCA-derivation-tile.png)
+- **Back to PCA**
+- N samples/vectors in some n-dimensional space, which we then combine into data matrix D where each row is a sample
+- **Calculate the mean of the samples:** for each feature, calculate the mean value
+- **Compute the mean-centred data U:** subtract the mean value for each feature, from each instance of it in D
+- **Using mean-centred data U, calculate a covariance matrix**
+  - ![Covariance matrix](../imgs/covariance-matrix.png)
+  - We can then determine:<br>![PCA determines](../imgs/covariance-proof.png)
+  - **Where the eigenvectors are in an orthogonal matrix, phi**
+  - **And the eigenvalues are in an ordered diagonal matrix, Lambda** - the amplitudes of the eigenvalues are proportional to the percentage of overall variance accounted for by the associated eigenvector
+
+#### Performance Metrics
+- **Computation Time**
+  - How long did it take?
+- **Success and Failure Rates**
+  - Require some ground truth - manually computed
+  - Metrics based around: True Positives(TP), True Negatives(TN), False Positives(FP), and False Negatives(FN)
+  - Computing:<br>![Metrics](../imgs/metrics/png)
