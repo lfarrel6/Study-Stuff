@@ -140,3 +140,32 @@
   - Can be used to determine local maxima/minima
 
 ## Region Segmentation and Connectivity
+
+#### Connectivity
+- Lets us reason about objects in a scene, tell which pixels are connected
+- Build a concept of regions using pixel adjacency
+- **4 adjacency vs 8 adjacency:** alternate between them for best results
+  - 4 adjacency on outer bg - 8adjacency on outer object - 4 adjacency on holes - 8 adjacency on objects in holes
+- **Connected Components Analysis:** having identified regions, use a single adjacency to label each non-zero pixel
+  - for every row: label each non-zero pixel - if previous pixels were all bg, assign new label - else pick a label from previous pixels, if any of the previous pixels have a different label, note equivalence
+
+#### Segmentation
+- Split image into smaller parts, preferably corresponding to particular objects
+##### Region based
+- **Watershed segmentation:** identify all regional minima - label as different regions - flood from minima to extend the regions - point of confluence between regions is a watershed line.
+  - Minimum of what? Greyscale values/Inverse of Gradient/Inverse of Chamfer Distance
+  - **Problems:** gives too many regions - can use pre-determined markers instead of minima
+- **Meanshift Segmentation:** alternative to K-Means - doesn't require pre-determinednumber of clusters, and accounts for spatial location
+  - **Kernel Density Estimation:** Given a sparse dataset, determine an estimate of density at each point - we use this to smooth the samples.
+  - ![Kernel Density Estimation](../imgs/KernelDensityEst.png)
+    - Where `n` is the number of samples, and `h` is the bandwidth
+  - For a multidimensional dataset:<br>![MultiDimensional KDE](../imgs/multidimensional-kde.png)
+  - Typically we use a uniform or Guassian kernel:<br>![Types of Kernels](../imgs/kernels.png)
+  - **The algorithm of meanshift:**<br>For each pixel: estimate KDE and the **mean shift vector**(direction of local increasing density), shift the particle to the new mean, recompute until stabilization<br>Pixels which end in the same location form a cluster, assign local mean.
+  - **The kernel density estimate is calculated using points within a spatial and colour range.**<br>![Restricted KDE](../imgs/Restricted-KDE.png)
+    - Requires a spatial and colour kernel - both can be gaussian, both limit and weight the considered points
+  - We calculate our **mean shift vector** as:<br>![Mean shift vector](../imgs/meanshift-vector.png)
+  - **Pros of Meanshift:** don't need to know the number of clusterns, accounts for spatial and colour differences
+  - **Cons of Meanshift:** slow, selection of kernel is tricky
+- **Edge based**
+  - Binary regions generally identified using edge detection
