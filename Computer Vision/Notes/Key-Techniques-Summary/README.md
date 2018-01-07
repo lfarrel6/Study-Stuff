@@ -358,4 +358,56 @@
 - **Success and Failure Rates**
   - Require some ground truth - manually computed
   - Metrics based around: True Positives(TP), True Negatives(TN), False Positives(FP), and False Negatives(FN)
-  - Computing:<br>![Metrics](../imgs/metrics/png)
+  - Computing:<br>![Metrics](../imgs/metrics.png)
+
+## Edges
+
+#### Edge Detection
+- Analysis of the discontinuities in an image - an abrupt change in brightness
+- **Edges have magnitude(gradient), and direction(orientation)**
+- **1st Derivation Edge Detection**
+- The first derivative is the rate of change in two directions, can calculate the gradient, and orientation
+  - Gradient:<br>![Magnitude](../imgs/Gradient.png)
+  - Orientation:<br>![Orientation](../imgs/orientation.png)
+- **Roberts Edge Detector**
+  - Uses two partial derivatives to compare diagonal differences between pixels:<br>![delta1](../imgs/delta1.png)<br>![delta2](../imgs/delta2.png)
+  - Two convolutional masks, moved across the image to compute the function
+  - RMS computes the gradient, inverse tan gets the angle
+  - Only should really be used on binary - change is too gradual otherwise (only considers adjacency)
+  - Edges are a half pixel out due to the result being between the two partial derivs
+- **All edge detectors should: cross at a single middle point (ideally the centre of a pixel), evaluate points that aren't too close together and handle noise**
+- **Compass Edge Detectors (Prewitt and Sobel)**
+  - Partial Derivatives defined for a number of orientations (typically 8), we generally just take 2 orthogonal ones
+  - **Prewitt:** all compass point permutations comprised of 1s,0s, and -1s
+  - **Sobel:** same matrices as Prewitt, but the centre 1 and -1 is changed to 2 and -2 respectively.
+  - These masks implement smoothing, account for more distant pixels, and have a real centre.
+- **Thresholding**
+  - Simple thresholding will give us too few or too many points
+  - **Non-Maxima Suppression:** Use gradient and orientation info to identify central edge points
+    - Orientations are quantised to 8 values (compass points), use this info to compare an edge pixel to the pixel 'ahead' and 'behind' of the current one.
+- **2nd Derivative Edge Detection**
+  - **Laplace operator**
+  - ![laplace](../img/laplace.png)
+  - High weighting of the central pixel makes this approach susceptible to noise, so follow with smoothing
+- 2nd Derivative Edge Detectors find the edges without orientation - location and gradient
+  - **Gradient Magnitude = slope of zero crossing** - very computationally expensive, so use magnitude from first deriv
+  - 2nd derivative gives far greater edge location accuracy
+- **Marr-Hildreth Edge Detection**
+  - 2nd derivative zero crossings
+  - Requirees smoothing - filter must be smooth and band limited - spatially localised (prevents edges being moved)
+  - Optimal solution is Gaussian Filter:<br>![Gaussian](../imgs/Gaussian.png)
+- **Laplacian of Gaussian:** Combine the application of gaussian smoothing and the laplacian operator.
+  - ![laplacian of gaussian](../imgs/laplacian-of-gaussian.png)
+  - Gives us the mexican hat filter: strong positive in centre, drops to negative and then zeros out.
+  - **Pros:** takes into account large area, guarantees closed loop of edges
+  - **Cons:** can miss edges if nucleated, loses corners from smoothing, can be expensive
+- **Multi-Scale Edge Detection**
+  - Processing at multiple scales simultaneously gives us information we otherwise would not have
+  - Use multiple gaussians on one image to obtain a sense of scale, taking common discontinuities to be edges
+  - **Canny**
+  - Coimbines first and second derivatives - **obtains magnitude and orientation**
+  - Optimises: detection, localisation, single response
+  - Algorithm: convolve image with Gaussian<br>Estimate edge orientation using first derivative<br>Locate the edges, perform non-maxima suppression using zero-crossing<br>Compute edge magnitude using first derivative<br>Threshold edges with hysteresis and repeat for multiple scales<br>Feature synthesis
+- **Multispectral(colour) Edge Detection**
+  - Can be difficult: different colours have similar greyscales
+  - 3 primary approaches:<br>**Vector methods** - treat colours as vectors, calculate median vector and vector distance, use these to compute magnitude and orientation<br>**Multidimensional gradient methods** - gradient and orientation are computed using data from all three channels - expensive<br>**Output fusion methods** - Separate computation of gradient and orientation for all channels and then combine them into one using weighted sum.
