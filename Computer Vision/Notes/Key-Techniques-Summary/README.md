@@ -29,7 +29,9 @@
 - Linear Smoothing Transformations
   - Image averaging - average based on n images (assumes: static camera & scene, statistical independence)
   - Local Averaging and Gaussian Smoothing: Averaging filters - local neighbourhood, can use different masks
-    - ![AVERAGING FILTERS/MASKS](../imgs/masks.png)
+
+<img src="../imgs/masks.png" alt="AVERAGING FILTERS/MASKS" height="200"/>
+
 - Non-Linear Smoothing Transformations 
   - Define multiple masks/regions - need to choose size and shape - use the average of most homogeneous mask
   - For each point - calculate dispersion, assign output point average of mask with min dispersion
@@ -55,11 +57,15 @@
   - 8 bits per channel is too much - 2 bits per channel - 64 cells
 - **Equalisation** - deals with poor contrast - redistribute greyscale in an image
   - When working with colour images, only change the luminance values
-  - ![Equalisation psuedo code](../imgs/equalisation.png)
+
+<img src="../imgs/equalisation.png" alt="Equalisation psuedo code" height="200"/>
+
 - **Histogram Comparison** - use to find similar images - compares colour distributions
-  - ![Histogram Comparison Metrics](../imgs/histogram-comparison.png)
-  - Can also use Earth Mover's Distance: min cost of turning one distribution into another - easy for 1D, harder for 3D
-  - `EMD(-1) = 0`<br>`EMD(i) = h1(i) + EMD(i-1) - h2(i)`<br>`Earth Mover's Distance = sum of all EMD`
+
+<img src="../imgs/histogram-comparison.png" alt="Histogram Comparison Metrics" height="230">
+
+- Can also use Earth Mover's Distance: min cost of turning one distribution into another - easy for 1D, harder for 3D
+- `EMD(-1) = 0`<br>`EMD(i) = h1(i) + EMD(i-1) - h2(i)`<br>`Earth Mover's Distance = sum of all EMD`
 - **Back Projection** - colour selection based on samples
   - Obtain a sample set - histogram the samples - normalize the histogram (max 1.0) - back project normalized histogram onto image f(i,j)
   - Result is **a probability image, p(i,j) indicating the similarity between f(i,j) and sample set**
