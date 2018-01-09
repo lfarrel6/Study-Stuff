@@ -24,14 +24,17 @@ a) The notion of being tall: can be represented using a sigmoid function, as the
 at which point it continues as a certainty (1): \mu_{tall}(x) = \frac{1}{1+\e^{-a*(x-c)}}
 
 About-ness: aboutness can be represented using a symmetric triangular function
-``` \mu_{about}(x) = 1 - \vbar \frac{m-x}{d} \vbar if x is \leq m+d and x \geq m-d 
-                     else if x > m+d or x < m-d then 0 ```
+```latex
+\mu_{about}(x) = 1 - \vbar \frac{m-x}{d} \vbar if x is \leq m+d and x \geq m-d 
+                     else if x > m+d or x < m-d then 0 
+```
 
 Approximately between: the notion of a value being approximately between two values can be represented using a trapezoidal membership funciton
 \mu_{between}(x) = \max{\min{ \frac{x-a}{b-a},1,\frac{d-x}{d-c} },0}
 
 b) The appropriateness of the velocity of a rotation disk can be captured into a fuzzy set according to the trapezoidal membership function:
-``` \mu_{velocity}(x) = \max{\min{ \frac{x-a}{b-a},1,\frac{d-x}{d-c} },0} where a is the speed below which is should not fall,
+```
+\mu_{velocity}(x) = \max{\min{ \frac{x-a}{b-a},1,\frac{d-x}{d-c} },0} where a is the speed below which is should not fall,
 b is the lower acceptable velocity, c is the upper acceptable velocity, and d is the maximum speed which it should not exceed.
 ```
 The core values of the velocity fuzzy set is the subset of acceptable values for which the membership to the velocity set is 1.
@@ -41,7 +44,7 @@ No, a machine with a velocity function with no core would have no concept of an 
 
 c)
 Classic | Fuzzy
---------|-------
+---------|----------
 if A then B | if A(\mu_{A}) then B(\mu_{B})
 A is-a-part-of B | for all x of X, \mu_{A}(x) \leq \mu_{B}(x)
 A:=5 and if A < 5 then B:=A+5 | ?
