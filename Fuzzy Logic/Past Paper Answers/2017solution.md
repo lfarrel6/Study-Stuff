@@ -51,3 +51,26 @@ A:=5 and if A < 5 then B:=A+5 | ?
 A weighs 5 kg | A weighs about 5kg
 A is false | \mu_{false-A}(x) = 1- \mu_{A}(x)
 A belongs-to-class B, so !A does-not-belong-to B | (this is an expression of the law of contradiction, which isn't obeyed in fuzzy logic) \mu_{B}(A) > 0 , \mu_{B}(!A) = 1 - \mu_{B}(A)
+
+## Q3
+
+a) The fundamental difference between Mamdani control and TSK control systems is that a Mamdani control system utilises membership functions for both antecedents and consequents, and sees greater accuracy as a result. A TSK system uses membership functions for antecedents but uses a linear function to model the consequent, this makes it less accurate but more computationally efficient..
+
+The TSK model makes an explicit assumption that within each partition the output variable is decided by a linear function of the inputs.
+This is based on the assumption that human experts in a control environment do not think using membership functions but rather they partition the variables.
+
+b) Zero order TSK system: rule output is a constant.
+Rule Base:
+```
+1: IF COLD THEN 0
+2: IF COOL THEN 30
+3: IF PLEASANT THEN 50
+4: IF WARM THEN 50
+5: IF HOT THEN 100
+```
+for temp = 1: COLD is max at 0 (1), min at 10 (0), so at 1 it is 0.9. COLD also fires, assymetric triangle mf - max(min((x-0)/(12.5-0), (17.5-x)/(17.5-12.5),0), for 1: 1/12.5 = 0.08.
+R1 output: (0.9\*0)
+R2 output: (0.08\*30)
+sys out: (0.9\*0)+(0.08\*30)/(0.9+0.08) = 2.44898 RPM
+
+c) ...
