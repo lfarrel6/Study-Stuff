@@ -37,3 +37,31 @@
   - Need lots of data (not always available), can be a blackbox, legal implications, cannot unit test
 
 # Linear Regression
+- Fit a line to your data :dizzy_face:
+- Hypothesis: h<sub>&theta;</sub>(x) = &theta;<sup>T</sup>x
+  - Where &theta; is a vector of parameter weights, and x is our data (incl. Dummy variable x<sub>0</sub> = 1)
+- Cost function: ![Linear Regression Cost](../imgs/lin-reg-cost.png)
+  - Calculates the average residual
+- Minimisation done through gradient descent:
+  - ![Linear Regression Gradient Descent](../imgs/lin-reg-gdesc.png)
+  - Where &alpha; is the learning rate, m is the size of the data set
+- Normalization
+  - ![Normalisation](../imgs/normalisation.png)
+- Batch Gradient Descent (BGD)
+  - At each iteration, BGD uses all m training data, updates all n+1 parameters
+- Co-ordinate Gradient Descent (CGD)
+  - At each iteration update only one param
+- Stochastic Gradient Descent (SGD)
+  - Loop through training set, each time updating the parameters w.r.t a single instance
+- **Closed Form Solution**
+  - Find &theta; that minimises J(&theta;) in closed form
+  - ![Closed form](../imgs/closed-form-gdesc.png)
+  - where y is the vector of targets, and X is matrix of data
+- Regularization
+  - Overfitting: adding more parameters, fitting to noise in dataset
+  - Underfitting: poorly fitted data due to too few parameters
+  - Quadratic/L2 penalty: &theta;<sup>T</sup>&theta; - encourages small values of theta - **Ridge**
+  - L1 penalty: sum of absolute values of &theta; - encourages fewer elements of &theta; to be non-zero - **LASSO**
+- Cross-validation for feature/model selection
+  - Divide the data into chunks, and calculate &theta; for each, using it to tune the features/parameters
+  - Can be used for Confidence intervals - 10 chunks = 10 samples in CI formula, take mean accuracy
