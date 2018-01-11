@@ -3,7 +3,7 @@
 ## Sections
 - [ML in Action](#ml-in-action)
 - [Linear Regression](#linear-regression)
-
+- [Classification](#classification)
 
 # ML in Action
 - Data mining - The process of discovering patterns in large datasets
@@ -65,3 +65,18 @@
 - Cross-validation for feature/model selection
   - Divide the data into chunks, and calculate &theta; for each, using it to tune the features/parameters
   - Can be used for Confidence intervals - 10 chunks = 10 samples in CI formula, take mean accuracy
+
+# Classification
+- Logistic Regression for two class problem: h<sub>&theta;</sub>(x) = sign(&theta;<sup>T</sup>x)
+- &theta;<sup>T</sup>x defines: a point in one dimension, a line in two dimensions, a plane in higher dimensions
+- 0-1 Loss Function: essentially counts the number of incorrect predictions and divides number of predictions
+- **Log-loss:**
+  - ![Log Loss function](../imgs/log-loss.png)
+  - Penalties are propotional to distance from correct label
+- Gradient Descent
+  - Partial Deriv:<br>![Log Loss Partial Derivative](../imgs/log-reg-partial-deriv.png)
+  - So starting with some &theta;...
+  - ![Gradient Descent](../imgs/gradient-desc-logreg.png)
+  - Where &alpha; is the learning rate
+- Multiclass logistic regression
+  - Train a classifier for every classifier to make it into a binary problem
