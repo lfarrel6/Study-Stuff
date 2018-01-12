@@ -4,6 +4,7 @@
 - [ML in Action](#ml-in-action)
 - [Linear Regression](#linear-regression)
 - [Classification](#classification)
+- [Evaluation](#evaluation)
 
 # ML in Action
 - Data mining - The process of discovering patterns in large datasets
@@ -70,8 +71,8 @@
 - Logistic Regression for two class problem: h<sub>&theta;</sub>(x) = sign(&theta;<sup>T</sup>x)
 - &theta;<sup>T</sup>x defines: a point in one dimension, a line in two dimensions, a plane in higher dimensions
 - 0-1 Loss Function: essentially counts the number of incorrect predictions and divides number of predictions
-- **Log-loss:**
-  - ![Log Loss function](../imgs/log-loss.png)
+- **Loss:**
+  - ![Loss function](../imgs/log-loss.png)
   - Penalties are propotional to distance from correct label
 - Gradient Descent
   - Partial Deriv:<br>![Log Loss Partial Derivative](../imgs/log-reg-partial-deriv.png)
@@ -80,3 +81,45 @@
   - Where &alpha; is the learning rate
 - Multiclass logistic regression
   - Train a classifier for every classifier to make it into a binary problem
+
+# Evaluation
+- Effectiveness: doing the right things
+- Efficiency: doing things right - achievement per unit input
+- Standard forms of evaluation: minimizing errors, maximize precision/accuracy etc.
+- Offline Evaluation - Measuring success on historical data
+  - RMSE, accuracy, precision etc.
+- Offline Classification Metrics
+  - Confusion matrix
+  - Accuracy (micro): correct predictions/all predictions
+  - Accuracy (macro): calculate accuracy on a per class basis
+  - Log-Loss: measures the unpredictability of true distribution against the prediction distribution (how much extra noise is added by the labels)
+    - ![Log Loss](../imgs/LogLoss.png)<br>Where p is the probability that the label is correct/binary indicator
+  - Receiver Operating Characteristic Curve (ROC) - TP vs FP - shows how many TP are gained by accepting more FP
+  - Area Under the Curve (AUC) - translates the curve to a usable value - values from 0 to 1, 0.5 is random classifier
+  - Recall: true positives of all positives
+  - Precision-Recall curve: plot of precision vs recall
+  - F-Measure: harmonic mean of precision and recall - (&beta;<sup>2</sup> + 1) x (precision\*recall)/[(&beta;<sup>2</sup> x precision) + recall]
+    - &beta; > 1 emphasizes recall, &beta; < 1 emphasizes precision
+- Ranked retrieval metrics
+  - Precision: p@n, precision among top n results
+  - Mean Reciprocal Rank: reciprocal of the rank of the first relevant result averaged over the number of queries
+  - Mean Average Precision: averages the p@n metric over a number of queries
+  - Cumulative Gain: sum of the relevance of top k items, to discount divide by log2(rank+1)
+- Regression Metrics
+  - Mean Absolute Error (MAE): average of the absolute error between prediction/observation
+  - Root Mean Squared Error (RMSE): the square root of (sum of squared errors, divided by number of instances)
+- Online Metrics
+  - A/B tests - showing A to 50%, B to 50%
+- Splitting Methods
+  - K-Fold cross validation
+- Importance of Time
+  - Rating performance over time
+  - Considering time during training and testing - time sensitive data
+- Assumption of offline data is that the data is static i.e. verifying my model on offline data will work on online data :thumbsdown:
+- Gold standard
+  - Analogous to monetary gold standard to compare currency value
+  - In ML: best method or data under reasonable conditions
+- Statistical Significance
+  - Describes probability that an observed distance is by chance
+  - Typical p value < 0.05 or 0.01
+  - Probability of obtaining evidence
