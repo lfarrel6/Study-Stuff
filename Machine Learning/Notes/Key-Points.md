@@ -6,6 +6,7 @@
 - [Classification](#classification)
 - [Evaluation](#evaluation)
 - [Probabilistic Interpretation](#probabilistic-interpretation)
+- [Support Vector Machines (SVM)](#support-vector-machines-(svm))
 
 # ML in Action
 - Data mining - The process of discovering patterns in large datasets
@@ -147,3 +148,24 @@
   - We can take logs and drop P(D=d) as it is fixed:<br>![Log of Posterior](../imgs/Log-Posterior.png)
 - Ride Regression
   - MAP estimate selects &theta; to minimise the sum of the loss and regularisation
+
+# Support Vector Machines (SVM)
+- Use hinge loss function: max(0,1-y&theta;<sup>T</sup>x)
+  - 0 penalty to predictions with the correct sign (scale theta to ensure 0 loss)
+-  Use regularisation penalty: &theta;<sup>T</sup>&theta;
+- Final Cost function
+  - ![SVM Cost Function](../imgs/SVM-cost-function.png)
+  - where &lambda; > 0 is a weighting parameter that we choose - small &lambda; gets smaller margin, larger &lambda; gets larger margin
+- Select line which maximises margin - trade off between accuracy and margin size
+- Decision boundary is &theta;<sup>T</sup>x = 0
+  - &theta;<sup>T</sup>x = b is a parallel line shifted up by b, passing through point x<sup>(i)</sup> (the support vector)
+  - |b| = y<sup>(i)</sup>&theta;<sup>T</sup>x<sup>(i)</sup> snce y = -1|1
+- Margin is:
+  - ![Margin Equation](../imgs/SVM-margin.png)
+  - Minimising a negative version of it maximises the margin.
+- Gradient Descent for SVMs:
+  - Max() is non differentiable - need subgradient
+  - Subgradient of max(1-z) is -1 when z &leq; 1 and 0 when z> 1
+  - Derivative of 1 - y&theta;<sup>T</sup>x w.r.t &theta;<sub>j</sub> is yx<sub>j</sub>
+  - So subgradient of max(0,1-y&theta;<sup>T</sup>x) is -yx<sub>j</sub> when y&theta;<sup>T</sup>x &leq; 1 else 0
+  - **Subgradient of J(&theta;) w.r.t &theta;<sub>j</sub> is then:<br>**![Gradient Descent SVM](../imgs/gradient-descent-svm.png)
